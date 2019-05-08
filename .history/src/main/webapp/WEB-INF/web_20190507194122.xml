@@ -4,17 +4,35 @@
 	http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
 	<display-name>Sample Restful Web Application</display-name>
 
-	<context-param>
+	<!-- reference : http://docs.jboss.org/resteasy/docs/2.3.7.Final/userguide/pdf/resteasy-reference-guide-en-US.pdf -->
+	<!-- Auto scan REST service -->
+	<!-- <context-param>
+		<param-name>resteasy.scan</param-name>
+		<param-value>true</param-value>
+	</context-param> -->
+
+	<!-- this need same with resteasy servlet url-pattern -->
+	<!-- <context-param>
 		<param-name>resteasy.servlet.mapping.prefix</param-name>
 		<param-value>/rest</param-value>
+	</context-param> -->
+	<context-param>
+		<param-name>resteasy.providers</param-name>
+		<param-value>com.san.validation.InvalidRequestExceptionMapper</param-value>
 	</context-param>
+
+	<listener>
+		<listener-class>
+			org.jboss.resteasy.plugins.server.servlet.ResteasyBootstrap
+		</listener-class>
+	</listener>
 
 	<servlet>
 		<servlet-name>resteasy-servlet</servlet-name>
 		<servlet-class>org.jboss.resteasy.plugins.server.servlet.HttpServletDispatcher</servlet-class>
 		<init-param>
 			<param-name>javax.ws.rs.Application</param-name>
-			<param-value>com.san.RestApplication</param-value>
+			<param-value>com.san.config.RestConfig</param-value>
 		</init-param>
 	</servlet>
 
@@ -24,36 +42,16 @@
 	</servlet-mapping>
 
 	<servlet>
-		<servlet-name>swagger-servlet</servlet-name>
-		<servlet-class>io.swagger.jaxrs.config.DefaultJaxrsConfig</servlet-class>
+		<servlet-name>DefaultJaxrsConfig</servlet-name>
+		<servlet-class>com.wordnik.swagger.jaxrs.config.DefaultJaxrsConfig</servlet-class>
 		<init-param>
 			<param-name>api.version</param-name>
 			<param-value>1.0.0</param-value>
 		</init-param>
 		<init-param>
-			<param-name>swagger.pretty.print</param-name>
-			<param-value>true</param-value>
-		</init-param>
-		<init-param>
 			<param-name>swagger.api.basepath</param-name>
 			<param-value>http://localhost:8080/rest</param-value>
 		</init-param>
-		<init-param>
-			<param-name>swagger.api.title</param-name>
-			<param-value>Swagger RESTEasy</param-value>
-		</init-param>
-		<init-param>
-			<param-name>scan.all.resources</param-name>
-			<param-value>true</param-value>
-		</init-param>
-		<!-- <init-param>
-			<param-name>swagger.filter</param-name>
-			<param-value>filter-class</param-value>
-		</init-param> -->
-		<!-- <init-param>
-			<param-name>ignore.routes</param-name>
-			<param-value>comma-separated-values</param-value>
-		</init-param> -->
 		<load-on-startup>2</load-on-startup>
 	</servlet>
 

@@ -1,32 +1,22 @@
-package com.san.to;
+package com.san.co;
+
+import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
-@ApiModel(value = "Student", description = "Student Details Model")
-public class StudentTO {
+@JsonIgnoreProperties(ignoreUnknown = true)
+@ApiModel(description = "Search Student Request Model")
+public class SearchStudentCO {
 
-	private static long _studentIdCounter = 0;
-
-	@ApiModelProperty(value = "student's unique id")
-	private long id = ++_studentIdCounter;
-
-	@ApiModelProperty(value = "student's name")
+	@ApiModelProperty(value = "student's name", example = "xyz")
 	private String name;
 
-	@ApiModelProperty(value = "student's roll number")
+	@ApiModelProperty(value = "student's roll number", example = "20")
 	private int rollNumber;
 
-	@ApiModelProperty(value = "student's age")
+	@ApiModelProperty(value = "student's age", example = "12")
 	private int age;
-
-	public long getId() {
-		return id;
-	}
-
-	public void setId(long id) {
-		this.id = id;
-	}
 
 	public String getName() {
 		return name;

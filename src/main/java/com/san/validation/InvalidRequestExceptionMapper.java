@@ -11,6 +11,7 @@ import javax.ws.rs.ext.Provider;
 
 import org.hibernate.validator.method.MethodConstraintViolation;
 import org.hibernate.validator.method.MethodConstraintViolationException;
+import org.jboss.resteasy.spi.NotFoundException;
 
 import com.san.to.ErrorTO;
 
@@ -38,6 +39,9 @@ public class InvalidRequestExceptionMapper implements ExceptionMapper<Throwable>
 				error.setErrorMessage("Invalid arguments provided");
 			}
 			httpResponse = Response.status(Status.BAD_REQUEST).entity(error).header(HttpHeaders.CONTENT_TYPE, "application/json").build();
+		} else if (exception instanceof NotFoundException) {
+			error.setErrorMessage("Requested resource not found");
+			httpResponse = Response.status(Status.NOT_FOUND).entity(error).header(HttpHeaders.CONTENT_TYPE, "application/json").build();
 		} else {
 			error.setErrorMessage("Some error occurred. Please contact to server administrator");
 			httpResponse = Response.status(Status.INTERNAL_SERVER_ERROR).entity(error).header(HttpHeaders.CONTENT_TYPE, "application/json").build();
