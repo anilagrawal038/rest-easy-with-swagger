@@ -20,6 +20,7 @@ public class InvalidRequestExceptionMapper implements ExceptionMapper<Throwable>
 
 	@Override
 	public Response toResponse(Throwable exception) {
+		System.out.println("InvalidRequestExceptionMapper invoked");
 		ErrorTO error = new ErrorTO("Invalid request");
 		Response httpResponse = null;
 		if (exception instanceof MethodConstraintViolationException) {
@@ -43,7 +44,7 @@ public class InvalidRequestExceptionMapper implements ExceptionMapper<Throwable>
 			error.setErrorMessage("Requested resource not found");
 			httpResponse = Response.status(Status.NOT_FOUND).entity(error).header(HttpHeaders.CONTENT_TYPE, "application/json").build();
 		} else {
-			error.setErrorMessage("Some error occurred. Please contact to server administrator");
+			error.setErrorMessage("Some error occurred. Please contact to server administrator. Error Message : " + exception.getMessage());
 			httpResponse = Response.status(Status.INTERNAL_SERVER_ERROR).entity(error).header(HttpHeaders.CONTENT_TYPE, "application/json").build();
 		}
 		return httpResponse;

@@ -35,6 +35,7 @@ import io.swagger.annotations.*;
 public class StudentResource {
 
 	Map<Long, StudentTO> studentsMap = new HashMap<Long, StudentTO>();
+	Map<Long, Integer> longProcessStatusMap = new HashMap<Long, Integer>();
 
 	@GET
 	@ApiOperation(value = "Fetch students list", response = StudentsTO.class)
@@ -53,7 +54,8 @@ public class StudentResource {
 	}
 
 	@POST
-	@Consumes({ MediaType.APPLICATION_JSON })
+	@Consumes({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
+	@Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
 	@ValidateRequest
 	@ApiOperation(value = "Add new student", response = StudentTO.class)
 	@ApiResponses(value = { //
@@ -147,6 +149,78 @@ public class StudentResource {
 		if (student != null) {
 			studentsMap.remove(id);
 			return Response.ok(new ResponseTO("Student record deleted for id : " + id)).build();
+		} else {
+			return Response.status(Status.BAD_REQUEST).entity(new ErrorTO("No student exists with id : " + id)).build();
+		}
+	}
+
+	@GET
+	@Path("process/{id:\\d+}")
+	@ApiOperation(hidden = true, value = "Execute some long process for existing students", response = ResponseTO.class)
+	@ApiResponses(value = { //
+			@ApiResponse(code = 102, response = ResponseTO.class, message = "Processing Request"), //
+			@ApiResponse(code = 103, response = ResponseTO.class, message = "Early Hints"), //
+			@ApiResponse(code = 400, response = ErrorTO.class, message = "Invalid Request"), //
+			@ApiResponse(code = 404, response = ErrorTO.class, message = "Resource Not Found"), //
+			@ApiResponse(code = 500, response = ErrorTO.class, message = "Internal Server Error") //
+	})
+	public Response process(@ApiParam(required = true, value = "student's unique id") @PathParam("id") long id) {
+		StudentTO student = studentsMap.get(id);
+		if (student != null) {
+			Integer status = longProcessStatusMap.get(id);
+			if (status == null) {
+				longProcessStatusMap.put(id, 1);
+				new Thread() {
+					public void run() {
+						try {
+							Thread.sleep(5000);
+						} catch (InterruptedException e) {
+						}
+						longProcessStatusMap.put(id, 2);
+						try {
+							Thread.sleep(5000);
+						} catch (InterruptedException e) {
+						}
+						longProcessStatusMap.put(id, 3);
+						try {
+							Thread.sleep(5000);
+						} catch (InterruptedException e) {
+						}
+						longProcessStatusMap.put(id, 4);
+						try {
+							Thread.sleep(5000);
+						} catch (InterruptedException e) {
+						}
+						longProcessStatusMap.put(id, 5);
+					}
+				}.start();
+				return Response.status(102).entity(new ResponseTO("Request accepted for id : " + id + " and being processed")).build();
+			} else {
+				Response response = null;
+				switch (status) {
+				case 1: {
+					response = Response.status(102).entity(new ResponseTO("Request accepted for id : " + id + " and being processed")).build();
+					break;
+				}
+				case 2: {
+					response = Response.status(103).entity(new ResponseTO("25% request processed for id : " + id)).header("Link", " <https://localhost:8080/rest/student/" + id + ">; rel=preload").build();
+					break;
+				}
+				case 3: {
+					response = Response.status(103).entity(new ResponseTO("50% request processed for id : " + id)).header("Link", " <https://localhost:8080/rest/student/" + id + ">; rel=preload").build();
+					break;
+				}
+				case 4: {
+					response = Response.status(103).entity(new ResponseTO("75% request processed for id : " + id)).header("Link", " <https://localhost:8080/rest/student/" + id + ">; rel=preload").build();
+					break;
+				}
+				case 5: {
+					response = Response.status(Status.OK).entity(new ResponseTO("Request processed for id : " + id + " successfully")).build();
+					break;
+				}
+				}
+				return response;
+			}
 		} else {
 			return Response.status(Status.BAD_REQUEST).entity(new ErrorTO("No student exists with id : " + id)).build();
 		}

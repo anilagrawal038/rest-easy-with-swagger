@@ -27,6 +27,8 @@ public class RestApplication extends Application {
 		Set<Class<?>> resources = new HashSet<Class<?>>();
 		resources.add(io.swagger.jaxrs.listing.ApiListingResource.class);
 		resources.add(io.swagger.jaxrs.listing.SwaggerSerializers.class);
+		resources.add(com.san.validation.ResourceNotFoundExceptionMapper.class);
+		resources.add(com.san.validation.ValidationExceptionMapper.class);
 		resources.add(com.san.validation.InvalidRequestExceptionMapper.class);
 		return resources;
 	}
