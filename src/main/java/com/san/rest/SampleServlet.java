@@ -15,7 +15,7 @@ public class SampleServlet extends HttpServlet {
 	@Override
 	public void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		PrintWriter pw = resp.getWriter();
-		pw.write("Sample Servlet Response");
+		pw.write("Sample Servlet Response, Request method : " + req.getMethod());
 		pw.close();
 	}
 
